@@ -1,0 +1,35 @@
+{
+    "polling_interval": 15,
+    "source": {
+        "method": "ifconfig.me"
+    },
+    "update": [
+        {
+            "method": "command",
+            "command": {
+                "source": "environment",
+                "command": ["logger", "-t", "domaind", "New address: $IP_ADDRESS"]
+            }
+        },
+        {
+            "method": "rest-api",
+            "rest-api": {
+                "request": {
+                    "path": "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records/$CF_RECORD_ID",
+                    "method": "PUT",
+                    "headers": {
+                        "Authorization": "Bearer $CF_API_TOKEN",
+                        "Content-Type": "application/json"
+                    },
+                    "body": {
+                        "type": "A",
+                        "name": "pc.rybchych.com",
+                        "content": "$IP_ADDRESS",
+                        "ttl": 120,
+                        "proxied":false
+                    }
+                }
+            }
+        }
+    ]
+}

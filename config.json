@@ -23,7 +23,7 @@
                     },
                     "body": {
                         "type": "A",
-                        "name": "pc.rybchych.com",
+                        "name": "my.example.com",
                         "content": "$IP_ADDRESS",
                         "ttl": 120,
                         "proxied":false

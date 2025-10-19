@@ -34,22 +34,27 @@ Maintainer: Anatolii Rybchych <tol.ryb@gmail.com>
 Description: Simple domain refresh service
 endef
 
+define INSTALL_TO
+	$(INSTALL) -d "$(1)$(daemon_dir)"
+	$(INSTALL) -Dm 755 domaind.py "$(1)$(daemon_bin)"
+	$(INSTALL) -d "$(dir $(1)$(default_config))"
+	[ -f "$(1)$(default_config)" ] || $(INSTALL) -Dm 755 config.json "$(1)$(default_config)"
+
+	$(file >service,$(call SYSTEMD_SERVICE))
+	$(INSTALL) -d "$(1)/etc/systemd/system/"
+	$(INSTALL) -Dm 644 service "$(1)/etc/systemd/system/domaind.service"
+	$(RM) -f service
+endef
+
 all: package deb
 
 package: domaind.py
-	$(INSTALL) -d pkg/$(daemon_dir)
-	$(INSTALL) -D -m 755 domaind.py pkg/$(daemon_bin)
-	$(INSTALL) -d pkg/$(dir $(default_config))
-	$(INSTALL) -D -m 644 config.json pkg/$(default_config)
+	$(INSTALL) -d pkg/
+	$(call INSTALL_TO,pkg/)
 
 deb: package
-
 	$(INSTALL) -d deb/etc/systemd/system
 	$(CP) -Rf pkg/* deb/
-
-	$(file >service,$(call SYSTEMD_SERVICE))
-	$(INSTALL) -Dm 644 service deb/etc/systemd/system/domaind.service
-	$(RM) -f service
 
 	$(INSTALL) -d deb/DEBIAN
 	$(file >control,$(call DEB_CONTROL))
@@ -58,7 +63,11 @@ deb: package
 	$(RM) -f control
 
 	dpkg-deb --build deb && mv -f deb.deb $(daemon_name).deb
+
+install:
+	$(call INSTALL_TO,)
+
 clean:
 	$(RM) -Rf deb pkg service control deb.deb domaind.deb
 
-.PHONY: all deb clean
+.PHONY: all deb clean install

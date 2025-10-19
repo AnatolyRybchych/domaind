@@ -38,7 +38,7 @@ define INSTALL_TO
 	$(INSTALL) -d "$(1)$(daemon_dir)"
 	$(INSTALL) -Dm 755 domaind.py "$(1)$(daemon_bin)"
 	$(INSTALL) -d "$(dir $(1)$(default_config))"
-	[ -f "$(1)$(default_config)" ] || $(INSTALL) -Dm 755 config.json "$(1)$(default_config)"
+	[ -f "$(1)$(default_config)" ] || $(INSTALL) -Dm 644 config.json "$(1)$(default_config)"
 
 	$(file >service,$(call SYSTEMD_SERVICE))
 	$(INSTALL) -d "$(1)/etc/systemd/system/"
